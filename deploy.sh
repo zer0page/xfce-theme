@@ -1,4 +1,10 @@
 #!/bin/sh
+#configs
+#uncomment to enable
+
+ENABLE_THEME=true
+ENABLE_FONT=true
+
 deploy_theme() {
     sudo add-apt-repository ppa:numix/ppa
     sudo add-apt-repository ppa:snwh/pulp
@@ -29,11 +35,20 @@ deploy_font() {
     make &&
     mkdir $HOME/.fonts
 
-    cp $HOME/roboto-src/roboto/out/RobotoOTF/* $HOME/.fonts &&
-    xfconf-query -c xsettings -p /Gtk/FontName -s 'Roboto 11'
+    cp $HOME/roboto-src/roboto/out/RobotoOTF/* $HOME/.fonts
 }
 
-deploy_theme
 
-#optional
-#deploy_font
+if $ENABLE_THEME; then
+    echo "Deploying theme..."
+    deploy_theme
+fi
+
+if $ENABLE_FONT; then
+    echo "Deploying font..."
+    deploy_font &&
+    xfconf-query -c xsettings -p /Gtk/FontName -s 'Roboto 11'
+else
+    echo "Using default font..."
+    xfconf-query -c xsettings -p /Gtk/FontName -s 'Noto Sans 9'
+fi
